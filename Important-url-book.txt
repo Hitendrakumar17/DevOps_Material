@@ -1,0 +1,26 @@
+
+>>>>>>> IMPORTANT URL 
+
+1. wHAT IS GIT ?
+
+	https://www.edureka.co/blog/what-is-git/
+
+
+2. INSTALL GIT ON cENTOS ( as a package or get source code, compile and install)
+
+	https://www.edureka.co/blog/install-git/?utm_source=blog&utm_medium=left-menu&utm_campaign=git-tutorial
+
+	OR
+
+	https://www.digitalocean.com/community/tutorials/how-to-install-git-on-centos-7
+
+
+3. MORE ABOUT GIT COMMANDS 
+
+	http://www.thegeekstuff.com/2011/08/git-install-configure/?utm_source=feedburner
+
+4. Free git eBOOK
+
+https://progit2.s3.amazonaws.com/en/2016-03-22-f3531/progit-en.1084.pdf
+
+
