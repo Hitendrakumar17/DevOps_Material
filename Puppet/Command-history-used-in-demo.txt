@@ -1,0 +1,205 @@
+docker run -d -v /home/edureka/docker-ws/master-vol/war/env1:/usr/local/tomcat/webapps -p 9081:8080 custom-tomcat:1.1 catalina.sh run
+
+edit /etc/hosts and change the ip address, restart network manager service
+
+
+tomcat::para::para1
+
+
+tomcat
+	manifest
+		para
+			para1.pp
+
+
+classes -- define -- writing the code Class abc {
+					package
+					file
+					}
+	
+		and declare
+				site.pp include abc
+
+
+
+class common
+
+{
+
+}
+
+class server
+++ resrouce
+
+	inherits common
+
+class client
+Client specific resourc
+	inherits common
+
+
+
+
+jenkins is doing the build
+
+jenkins is packaging the build as a war
+
+
+tomcat instance running for Test env.
+
+WE want puppet to do the deployment of new build into the tomcat instance
+
+
+HOW ???
+
+jenkins deploy job
+
+scp the build
+
+runt the docker build to create an image from a dockerfile .. and in this dockerfile, we are add the war 
+
+started new container from the new build image
+
+
+
+
+
+as a post step
+
+
+scp to a file server location
+
+deploy war using the file server mechanism
+
+
+
+	execute ssh to connect to puppet server
+	copy the addressbook war to puppet server
+	run the puppet agent 
+
+https://archive.apache.org/dist/tomcat/tomcat-8/v8.0.28/bin/https://archive.apache.org/dist/tomcat/tomcat-8/v8.0.28/bin/apache-tomcat-8.0.28.tar.gz
+
+https://archive.apache.org/dist/tomcat/tomcat-8/v8.0.28/bin/apache-tomcat-8.0.28.tar.gz
+
+
+
+
+
+
+
+su -
+
+Puppet certificate issue :
+puppet cert list --all
+   97  nano /etc/hosts
+   98  service network restart
+   99  ping puppet
+  100  puppet agent -t
+  101  puppet cert clean test02.edureka.com
+  102  find /var/lib/puppet/ssl -name test02.edureka.com.pem -delete
+  103  puppet agent -t
+  104  puppet cert list --all
+  105  puppet cert sign --all
+  106  puppet cert --allow-dns-alt-names sign test02.edureka.com
+  107  puppet agent -t
+  
+  
+/etc/puppet/modules
+
+puppet module generate MODULE-NAME --skip-interview
+tree test-user
+
+ puppet parser validate ./manifests/init.pp 
+ puppet apply tests/init.pp
+ 
+ 
+ 
+
+ puppet module search apache
+  
+ puppet module search ntp
+ 
+ puppet module install --modulepath=./ puppetlabs-ntp
+
+
+  
+
+/var/lib/jenkins/workspace/4.2-deploy-via-puppet
+
+
+site.pp
+
+node 'test02...." {
+
+hiera_includes ( 'class1, class2)
+
+
+
+
+
+
+
+resrouces -- anything on the system - file, user, pacakage, cron, exec , service, ....
+
+resrouces --> classes
+
+Classes --> Puppet prg --> manifests
+
+
+Manifest + other files+code --> Module
+
+
+	SITE.PP ??
+
+	it is the main file in puppet master
+	
+	it is shared among nodes
+	
+	resources are applied onto nodes
+
+
+jenkisn should build the file 
+
+jenkins should push this war file into the moduel directory
+
+moudle --> look for changes in this file
+
+--> whenever there is a change --> copy this file under webapps in tomcat
+
+
+site.pp
+
+node tomcat.edureka.com
+
+{
+
+include tomcat
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
