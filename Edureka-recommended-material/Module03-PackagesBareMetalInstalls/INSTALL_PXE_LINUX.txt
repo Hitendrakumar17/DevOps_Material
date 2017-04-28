@@ -1,0 +1,62 @@
+http://www.jedi.be/blog/
+*** PXE Server Setup
+	Setup Centos with DHCP already setup
+		*** yum install dhcp3 
+		**** edit /etc/dhcp.conf 
+	Set up TFTP
+		sudo yum install tftp-server
+	Enable TFTP	
+		edit /etc/xinetd.d/tftp and set disable to no ## /var/lib/tftpboot is it specified?
+	Restart xinetd	
+		service xinetd restart 
+**** Set up Boot Images
+	mkdir -p /tftpboot/images/centos/i386/3.0
+	mkdir -p /tftpboot/images/centos/i386/3.1
+	mkdir -p /tftpboot/images/centos/x86_64/3.0
+	mkdir -p /tftpboot/images/centos/x86_64/3.1
+	
+	mkdir -p /tftpboot/images/centos/i386/4.0
+	mkdir -p /tftpboot/images/centos/i386/4.1
+	mkdir -p /tftpboot/images/centos/x86_64/4.0
+	mkdir -p /tftpboot/images/centos/x86_64/4.1
+	
+	mkdir -p /tftpboot/images/centos/i386/5.0
+	mkdir -p /tftpboot/images/centos/i386/5.1
+	mkdir -p /tftpboot/images/centos/x86_64/5.0
+	mkdir -p /tftpboot/images/centos/x86_64/5.1
+
+For each "Release" and "ARCH", copy vmlinuz and initrd.img from /images/pxeboot/ on "disc 1" of that $RELEASE/$ARCH to /tftpboot/images/centos/$ARCH/$RELEASE. The Xen boot files are in /images/xen.
+
+*** Configure DHCP
+	Edit /etc/dhcpd.conf
+	allow booting;
+	allow bootp;
+	#option option-128 code 128 = string;
+	#option option-129 code 129 = text;
+	next-server 192.168.33.92;  
+	filename "/pxelinux.0"; # is the boot image... hardcoded for *nx... 
+	++++ Other DHCP Configurations... 
+*** REstart DHCP	
+	service dhcpd restart
+*** Install sysLinux
+	yum install syslinux
+**** Copy needed files
+    cp /usr/lib/syslinux/pxelinux.0 /var/lib/tftpboot
+	cp /usr/lib/syslinux/menu.c32 /tftpboot
+	cp /usr/lib/syslinux/memdisk /tftpboot
+	cp /usr/lib/syslinux/mboot.c32 /tftpboot
+	cp /usr/lib/syslinux/chain.c32 /tftpboot
+**** Create Directory for menus
+	mkdir /tftpboot/pxelinux.cfg  #HARDCODE DIRR FOR LINUX 
+	
+*** edit pxelinux.cfg/default and add
+	DEFAULT Centos53
+	PROMPT 100 
+	
+	LABEL CENTOS 53
+	KERNEL images/centos/5.3/i386/vmlinuz
+	APPEND initrd=images/centos/5.3/i386/initrd.img  ks=http://10.10.100.200/centos.cfg 
+	
+	LABEL UBUNTU
+	KERNEL images/ubuntu/5.3/i386/vmlinuz
+	APPEND initrd=images/ubuntu/5.3/i386/initrd.img ks=http://10.10.100.200/ubuntu.cfg 

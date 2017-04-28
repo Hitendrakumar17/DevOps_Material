@@ -1,0 +1,11 @@
+echo current DOCKER_HOST=
+export DOCKER_HOST=TCP://192.168.6.141:2376
+scp $WORKSPACE/addressbook_main/target/addressbook.war 
+/etc/puppet/environments/demo-module2/tomcat-demo/files
+
+echo "WAR Copied"
+echo dureka@test02.edureka.con "/home/edureka/scripts/buildScript.sh $BUILD_NUMBER"
+echo "Stareted Image creation"
+export IMAGE_VERSION_NUMBER=$BUILD_NUMBER
+
+

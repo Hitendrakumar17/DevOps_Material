@@ -1,0 +1,220 @@
+############################ START OF ANSIBLE
+####### Install Ansible
+## On Debian/Ubuntu
+sudo apt-get install software-properties-common
+sudo apt-add-repository ppa:ansible/ansible
+sudo apt-get update
+sudo apt-get install ansible
+## On Centos/RHEL 
+sudo yum install -y epel-release && sudo yum install -y ansible
+####### Create a working directory for same....
+cd $HOME
+mkdir -p ansible-nginx/tasks/						#make Directory
+touch ansible-nginx/deploy.yml						#Deployer file
+touch ansible-nginx/tasks/install_nginx.yml	#Task definition for centos
+# we are going to install NGINX on 192.168.33.92 (test07.edurekademo.co, Centos) and 192.168.33.82 (proxy, Ubuntu)
+# to see above directory structure "nicely" use tree
+# sudo apt-get install tree -y (or)sudo yum install -y tree
+# Content for deploy.yml, 
+### START OF CONTENT
+- hosts: nginx
+  tasks:
+    - include: 'tasks/install_nginx.yml'
+### END OF CONTENT 
+# Content for install_nginx.yml 
+### START OF CONTENT
+- name: NGINX | Installing NGINX repo rpm
+  yum:
+    name: http://nginx.org/packages/centos/7/noarch/RPMS/nginx-release-centos-7-0.el7.ngx.noarch.rpm
+  when: ansible_distribution == 'CentOS' or ansible_distribution == 'Red Hat Enterprise Linux'
+  
+- name: NGINX | Installing NGINX On Centos
+  yum:
+    name: nginx
+    state: latest
+  when: ansible_distribution == 'CentOS' or ansible_distribution == 'Red Hat Enterprise Linux'
+
+- name: NGINX | Installing NGINX On Debian
+  apt:
+    name: nginx
+    state: latest
+  when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
+  
+- name: NGINX | Starting NGINX
+  service:
+    name: nginx
+    state: started
+
+### END OF CONTENT 
+## Edit /etc/ansible/hosts to add the below 3 lines 
+[nginx]
+demo2.sridemo.com 
+proxy.sridemo.com
+## Register keys
+ssh-agent bash
+ssh-add ~/.ssh/id_rsa
+#Your public SSH key should be located in authorized_keys on those systems
+# one way is to copy your public key (id_rsa.pub) to remote systems and paste to end of authorized_keys
+## Validate connection
+ansible all -m ping
+## as root
+# ansible all -m ping --sudo --sudo-user root  # HAS BEEN DEPRECTAED
+ansible all -m ping  -b --become-user root  # USE THIS INSTEAD... 
+## Run code.....
+ansible-playbook -b --become-user root $HOME/ansible-nginx/deploy.yml
+
+
+ ansible-galaxy install username.rolename
+ ansible-galaxy install username.role -p ~/Code/ansible_roles/
+ (default is /etc/ansible/roles or roles_path)
+ ansible-galaxy install -r requirements.txt
+ ansible-galaxy install -r requirements.yml
+ e.g requirements.yml
+ # from github
+- src: yatesr.timezone
+- include: webserver.yml
+
+webserver.yml
+# from github
+- src: https://github.com/bennojoy/nginx
+
+# from github installing to a relative path
+- src: https://github.com/bennojoy/nginx
+ path: vagrant/roles/
+ 
+ ansible-galaxy init rolename
+ ansible-galaxy search elasticsearch --author geerlingguy
+ ansible-galaxy info username.role_name
+ ansible-galaxy list
+ ansible-galaxy remove username.rolename
+ ansible-galaxy login
+ansible-galaxy import github_user github_repo
+ ansible-galaxy setup travis github_user github_repo xxxtravistokenxxx
+ 
+ ansible-playbook foo.yml --check
+  check_mode: no (always_run: yes)
+   check_mode: yes
+   
+   
+     - name: this task will be skipped in check mode
+    git: repo=ssh://git@github.com/mylogin/hello.git dest=/home/mylogin/hello
+    when: not ansible_check_mode
+	
+	  - name: this task will ignore errors in check mode
+    git: repo=ssh://git@github.com/mylogin/hello.git dest=/home/mylogin/hello
+    ignore_errors: "{{ ansible_check_mode }}"
+ 
+############################ END OF ANSIBLE
+############################ START OF PUPPET
+##Enable Repos
+	##YUM Systems
+	#puppetlabs-release-<COLLECTION>-<OS ABBREVIATION>-<OS VERSION>.noarch.rpm
+#Therefore for RHEL, 
+		#sudo rpm - Uvh https://yum.puppetlabs.com/puppetlabs-release-pc1-el-7.noarch.rpm
+# for specific version For centos7/
+		#sudo rpm -ivh https://yum.puppetlabs.com/el/7/products/x86_64/puppetlabs-release-7-11.noarch.rpm
+#for Ubuntu 14.04
+wget https://apt.puppetlabs.com/puppetlabs-release-trusty.deb
+dpkg -i puppetlabs-release-trusty.deb
+apt-get update
+apt-get install puppetmaster 
+#Edir /etc/puppet/puppet.conf edit below 2 lines
+[main]
+dns_alt_names = demo1,demo1.sridemo.com
+#Also, remove the line templatedir=$confdir/templates, which has been deprecated.
+#Restart Server
+service puppetmaster start
+
+#### For latest versions, you still need to get the DEB/YUM package and install it.. 
+#### ***** the documentation. 
+#### For ubuntu 14.0.4, the agent is already installed...
+# but if you need to do it, 
+wget https://apt.puppetlabs.com/puppetlabs-release-trusty.deb
+sudo dpkg -i puppetlabs-release-trusty.deb
+sudo apt-get update -y
+sudo apt-get install puppet -y 
+
+### Change /etc/puppet/puppet.conf 
+# Client install for Ubuntu 14.0.4
+apt-get install puppet 
+# for YUM
+#sudo yum install puppet-agent
+### Depending on whic version, auth.conf is not automatically created..
+### if not already created, "touch" (create) it...
+#touch /etc/puppet/auth.conf
+#Edir /etc/puppet/puppet.conf edit below 2 lines
+[agent]
+server = demo1.sridemo.com
+#Restart client
+#service puppet start
+# to make this auto... 
+# enable in /etc/default/puppet (client) or /etc/default/puppetmaster (server) and set START to yes. 
+
+# Client install on RPM (specific to Centos)On
+rpm -ivh https://yum.puppetlabs.com/el/7/products/x86_64/puppetlabs-release-7-11.noarch.rpm
+yum install puppet
+#Edir /etc/puppet/puppet.conf edit below 2 lines
+[main]
+server = demo1.sridemo.com
+#Restart client
+systemctl start puppet	
+
+
+#Generate and Sign Certificates
+#on Client, run 
+	puppet agent -t 
+# on server. 
+	pupper cert list 
+	puppet cert sign <your cert name> 
+# on Client, run 
+	puppet agent -t 
+# Code .. see class Notes_session
+## Other interstng commands 
+puppet agent --fingerprint # on client
+puppet apply apache_php.pp --verbose
+puppet apply 
+## revoke a certificate...
+puppet cert clean desktop1.example.com
+
+# Set up tomcat on Puppet master
+puppet module list
+puppet module upgrade puppetlabs-stdlib
+puppet module install puppetlabs-apache
+puppet module install puppetlabs-tomcat 
+## See link on all of this.. https://forge.puppet.com/modules
+https://github.com/puppetlabs/puppetlabs-tomcat
+## https://docs.puppet.com/puppet/latest/reference/configuration.html
+##https://puppet.com/blog/which-logs-should-i-check-when-things-go-wrong
+
+Our WAR File is here: 
+http://169.254.154.35:8080/jenkins/job/DEMO_MAVEN/lastSuccessfulBuild/artifact/gameoflife-web/target/gameoflife.war
+
+# Adapt as required..
+puppet agent --configprint runinterval
+puppet config print manifest --section master --environment <ENVIRONMENT>
+
+#Generate a file via script..... 
+#sudo sh -c 'echo "<?php  phpinfo(); ?>" > /etc/puppet/modules/apache/files/info.php'
+sudo sh -c 'echo "<?php  phpinfo(); ?>" > /etc/puppet/files/info.php'
+
+## INstall the LINT CODE>.. 
+gem install puppet-lint
+
+### ADditional commands of interest
+# Get Types: 
+	puppet describe <type>
+	puppet describe --list 
+	puppet status <server>
+	puppet resource --types 
+### Test 
+gem install bundler
+bundle install
+bundle exec rake spec
+bundle exec rspec spec/acceptance
+RS_DEBUG=yes bundle exec rspec spec/acceptance
+
+### ANsible playbo
+oks
+debops.org
+ansible-galaxy install sprylab.tomcat-ubuntu
+ansible-playbook tomcat.yml -f 10

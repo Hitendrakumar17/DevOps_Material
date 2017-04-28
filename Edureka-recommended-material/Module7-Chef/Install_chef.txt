@@ -1,0 +1,65 @@
+************ Installing the Chef Server
+** alias Chef
+** Download the appropriate package
+** Installing	
+	** On Centos
+	rpm -Uvh /tmp/chef-server-core-<version>.rpm
+	** oN Ubuntu
+	dpkg -i /tmp/chef-server-core-<version>.deb
+** configure the same and restart it..
+	chef-server-ctl reconfigure
+
+*** CHEF 12 SPECIFIC 
+** create user
+	chef-server-ctl user-create USER_NAME FIRST_NAME LAST_NAME EMAIL 'PASSWORD' --filename FILE_NAME
+	# file_name is path to private key...
+** create org.. 
+   chef-server-ctl org-create short_name 'full_organization_name' --association_user user_name --filename ORGANIZATION-validator.pem
+
+*** Installing management console
+    chef-server-ctl install chef-manage
+	chef-server-ctl reconfigure
+	chef-manage-ctl reconfigure
+*** install push jobs
+    chef-server-ctl install opscode-push-jobs-server
+	chef-server-ctl reconfigure
+	opscode-push-jobs-server-ctl reconfigure
+*** Install reporting
+	chef-server-ctl install opscode-reporting
+	chef-server-ctl reconfigure
+	opscode-reporting-ctl reconfigure
+
+Install Client
+curl -L https://www.chef.io/chef/install.sh | sudo bash
+
+Alternatively
+knife bootstrap node_domain_or_IP -x username -P password -N name_for_node --sudo
+
+
+knife bootstrap 192.168.33.81 -x vagrant -P vagrant -N CHEF_CLIENT --sudo 
+
+C:/chef/chef-repo/.chef
+
+knife node edit node1 -a
+
+## sample:
+{
+   "normal": {
+   },
+   "name": "node1",
+   "override": {
+	"mycustomvariable":81
+   },
+   "default": {
+   },
+   "json_class": "Chef::Node",
+   "automatic": {
+   },
+   "run_list": [
+      "recipe[devops]",
+      "role[webserver]"
+   ],
+   "chef_type": "node"
+}
+
+knife upload /cookbooks/httpd
